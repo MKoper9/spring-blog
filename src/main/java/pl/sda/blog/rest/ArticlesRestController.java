@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
+@RequestMapping("/rest/articles")
 public class ArticlesRestController {
     private ArticleRepository articleRepository;
 
@@ -17,18 +18,18 @@ public class ArticlesRestController {
         this.articleRepository = articleRepository;
     }
 
-    @GetMapping("/articles")
+    @GetMapping
     public List<Article> getArticles() {
         return articleRepository.findAll();
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/articles")
+    @PostMapping
     public Article postArticles(@RequestBody Article article) {
         return articleRepository.save(article);
     }
 
-    @GetMapping("/articles/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Article> getArticleById(@PathVariable("id") UUID uuid) {
 
         return articleRepository.findById(uuid)
@@ -41,7 +42,7 @@ public class ArticlesRestController {
         return ResponseEntity.notFound().build();*/
     }
 
-    @PutMapping("/articles/{id}")
+    @PutMapping("/{id}")
     public Optional<Article> putArticle(@PathVariable("id") UUID uuid, @RequestBody Article articleThatWillReplaceTheOldOne) {
         return articleRepository.findById(uuid).map(article ->
                 {
@@ -51,7 +52,7 @@ public class ArticlesRestController {
         );
     }
 
-    @DeleteMapping("/articles/{id}")
+    @DeleteMapping("/{id}")
     public void deleteArticle(@PathVariable("id") UUID uuid) {
         articleRepository.deleteById(uuid);
     }
