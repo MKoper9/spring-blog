@@ -14,4 +14,5 @@ public class Article {
     @GeneratedValue
     private UUID id;
     private String title;
+    private String content;
 }
