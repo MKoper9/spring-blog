@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import pl.sda.blog.rest.ArticleRepository;
 
@@ -19,11 +20,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@WithMockUser
 @SpringBootTest
 @AutoConfigureMockMvc
 //@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class ArticlesControllerTest {
-    public static final String ARTICLES = "/articles";
+    public static final String ARTICLES = "/rest/articles";
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -38,22 +40,22 @@ public class ArticlesControllerTest {
 
     // @formatter:off
     @DisplayName(
-            "when GET on /articles, " +
+            "when GET on /rest/articles, " +
             "then 200 status is returned"
     )
     // @formatter:on
     @Test
     void test() throws Exception {
         mockMvc
-                .perform(get("/articles"))
+                .perform(get("/rest/articles"))
                 .andExpect(status().isOk());
     }
 
     // @formatter:off
     @DisplayName(
             "given article with title 'My First Article', " +
-            "when POST this article on /articles, " +
-            "then the same article can get retrieved by calling GET on /articles"
+            "when POST this article on /rest/articles, " +
+            "then the same article can get retrieved by calling GET on /rest/articles"
     )
     // @formatter:on
     @Test
@@ -82,7 +84,7 @@ public class ArticlesControllerTest {
     // @formatter:off
     @DisplayName(
             "given two created articles with titles 'My First article' and 'My Second Article', " +
-            "when GET /articles/id, where id is id of the first article, " +
+            "when GET /rest/articles/id, where id is id of the first article, " +
             "then only the first article is returned"
     )
     // @formatter:on
@@ -96,7 +98,7 @@ public class ArticlesControllerTest {
         createArticle(articleToSend2);
 
         // when
-        mockMvc.perform(get("/articles/{id}", idOfTheFirstArticle))
+        mockMvc.perform(get("/rest/articles/{id}", idOfTheFirstArticle))
 
         // then
                 .andExpect(status().isOk())
@@ -107,7 +109,7 @@ public class ArticlesControllerTest {
     // @formatter:off
     @DisplayName(
             "given two created articles with titles 'My First article' and 'My Second Article', " +
-            "when PUT new article with title 'Updated Article' on /articles/id, where id is id of the first article, " +
+            "when PUT new article with title 'Updated Article' on /rest/articles/id, where id is id of the first article, " +
             "then the title of the first article is now 'Updated Article'"
     )
     // @formatter:on
@@ -123,14 +125,14 @@ public class ArticlesControllerTest {
         // when
         String newArticleThatReplacesTheFirstOne = "{ \"title\": \"Updated Article\" }";
         mockMvc.perform(
-                put("/articles/{id}", idOfTheFirstArticle)
+                put("/rest/articles/{id}", idOfTheFirstArticle)
                 .content(newArticleThatReplacesTheFirstOne)
                 .contentType(MediaType.APPLICATION_JSON)
         )
 
         // then
                 .andExpect(status().isOk());
-        mockMvc.perform(get("/articles/{id}", idOfTheFirstArticle))
+        mockMvc.perform(get("/rest/articles/{id}", idOfTheFirstArticle))
                 .andExpect(jsonPath("$.title", is("Updated Article")));
         // @formatter:on
     }
@@ -138,7 +140,7 @@ public class ArticlesControllerTest {
     // @formatter:off
     @DisplayName(
             "given two created articles with titles 'My First article' and 'My Second Article', " +
-            "when DELETE article with /articles/id, where id is id of the first article, " +
+            "when DELETE article with /rest/articles/id, where id is id of the first article, " +
             "then the first article will be removed " +
             "and thus GET on /article/id, where id is id of the first article returns 404"
     )
@@ -154,12 +156,12 @@ public class ArticlesControllerTest {
 
         // when
         mockMvc.perform(
-                delete("/articles/{id}", idOfTheFirstArticle)
+                delete("/rest/articles/{id}", idOfTheFirstArticle)
         )
 
                 // then
                 .andExpect(status().isOk());
-        mockMvc.perform(get("/articles/{id}", idOfTheFirstArticle))
+        mockMvc.perform(get("/rest/articles/{id}", idOfTheFirstArticle))
                 .andExpect(status().is(404));
         // @formatter:on
     }

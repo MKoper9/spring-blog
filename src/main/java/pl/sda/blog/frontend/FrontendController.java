@@ -27,10 +27,12 @@ public class FrontendController {
     public ModelAndView showAllArticles() throws URISyntaxException {
         Map<String, List<Article>> articlesMap = new HashMap<>();
 
-        RequestEntity requestEntity = RequestEntity.get(new URI("http://localhost:8080/articles")).build();
+        RequestEntity requestEntity = RequestEntity.get(new URI("http://localhost:8080/rest/articles"))
+                .header("Authorization", "Basic dGVzdF91c2VyOnRlc3RfdXNlcl9wYXNzd29yZA==")
+                .build();
         ResponseEntity<List<Article>> articles = restTemplate.exchange(requestEntity,
                 new ParameterizedTypeReference<List<Article>>() {
-        });
+                });
         articlesMap.put("articles", articles.getBody());
 
         return new ModelAndView("articles", articlesMap);
