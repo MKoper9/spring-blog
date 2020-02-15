@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title>articles</title>
+</head>
+<body>
+Articles page
+
+<div style="width: 1000px; background: grey">
+    <div th:each="article: ${articles}" style="width: 720px; background: fuchsia">
+        <h1 th:text="${article.title}">Article Title</h1>
+        <div th:text="${article.content}" style="background: aqua">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ac odio eleifend, ultrices nisi pharetra, vehicula mauris. Etiam interdum et massa ut pellentesque. Suspendisse eu ornare enim. Vivamus a dui a nulla vestibulum laoreet et nec lacus. Cras ac justo semper, suscipit ligula et, posuere quam. Cras in leo in massa consequat iaculis et in ex. Cras nec elit eu erat pellentesque tincidunt. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Proin non vehicula velit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Vivamus vitae interdum tellus, quis gravida lectus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pharetra sed magna eu fringilla. Curabitur pharetra sollicitudin leo in laoreet.
+
+            Nam eu placerat nunc. Nunc sed sapien urna. Cras elit ante, volutpat id posuere in, mollis porttitor eros. Integer sit amet malesuada nisl, at facilisis magna. Integer quis sem et nisl hendrerit placerat aliquam ac urna. Praesent consectetur imperdiet risus vel gravida. Duis lobortis erat at velit ornare sagittis. Nulla auctor dui sit amet tortor vehicula consequat. Ut felis augue, rhoncus quis nisi id, tincidunt placerat nunc. Praesent ut finibus risus, a sodales dolor. Ut elit eros, vehicula at turpis sit amet, rutrum fermentum ante. Aliquam et viverra justo, sit amet tristique libero. Suspendisse magna nisl, congue id fringilla quis, efficitur ac mauris. Duis blandit blandit tellus, eget luctus dui vulputate at. Duis vel viverra nulla.
+
+            Morbi euismod, nisl ut iaculis lobortis, massa tortor convallis neque, et dictum augue quam id sapien. Nullam malesuada non magna id ultricies. Morbi id libero elementum, aliquam erat in, sollicitudin leo. Curabitur pretium nisi sed consequat volutpat. Nullam sed luctus ipsum, sed cursus lacus. Nulla sit amet porttitor lacus. Aenean tincidunt convallis ullamcorper. Nunc vestibulum, lectus eu luctus rutrum, eros felis facilisis tortor, a laoreet dolor arcu bibendum turpis. Nam commodo metus vitae dolor porttitor blandit. Vestibulum sodales tempor lorem, ac tincidunt velit tristique sit amet. Nulla sagittis nisi vitae massa laoreet ultrices. Mauris tristique, enim at finibus porta, purus nunc tempus libero, a pharetra augue odio ut mi. Nulla non ligula a urna finibus feugiat. Nullam eget volutpat magna.
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

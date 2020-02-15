@@ -1,18 +1,19 @@
-package pl.sda.blog;
+package pl.sda.blog.rest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.sda.blog.Article;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-public class ArticlesController {
+public class ArticlesRestController {
     private ArticleRepository articleRepository;
 
-    public ArticlesController(ArticleRepository articleRepository) {
+    public ArticlesRestController(ArticleRepository articleRepository) {
         this.articleRepository = articleRepository;
     }
 
