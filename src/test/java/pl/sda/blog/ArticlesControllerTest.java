@@ -134,6 +134,35 @@ public class ArticlesControllerTest {
         // @formatter:on
     }
 
+    // @formatter:off
+    @DisplayName(
+            "given two created articles with titles 'My First article' and 'My Second Article', " +
+            "when DELETE article with /articles/id, where id is id of the first article, " +
+            "then the first article will be removed " +
+            "and thus GET on /article/id, where id is id of the first article returns 404"
+    )
+    // @formatter:on
+    @Test
+    void test4() throws Exception {
+        // @formatter:off
+        // given
+        String articleToSend1 = "{ \"title\": \"My First Article\" }";
+        String articleToSend2 = "{ \"title\": \"My Second Article\" }";
+        UUID idOfTheFirstArticle = createArticle(articleToSend1);
+        createArticle(articleToSend2);
+
+        // when
+        mockMvc.perform(
+                delete("/articles/{id}", idOfTheFirstArticle)
+        )
+
+                // then
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/articles/{id}", idOfTheFirstArticle))
+                .andExpect(status().is(404));
+        // @formatter:on
+    }
+
     private UUID createArticle(String article) throws Exception {
         String resultAsJson = mockMvc
                 .perform(

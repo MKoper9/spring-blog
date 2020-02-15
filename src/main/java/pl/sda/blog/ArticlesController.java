@@ -1,6 +1,7 @@
 package pl.sda.blog;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,8 +28,16 @@ public class ArticlesController {
     }
 
     @GetMapping("/articles/{id}")
-    public Optional<Article> getArticleById(@PathVariable("id") UUID uuid) {
-        return articleRepository.findById(uuid);
+    public ResponseEntity<Article> getArticleById(@PathVariable("id") UUID uuid) {
+
+        return articleRepository.findById(uuid)
+                .map(article -> ResponseEntity.ok(article))
+                .orElse(ResponseEntity.notFound().build());
+/*
+        if (articleRepository.findById(uuid).isPresent()) {
+            return ResponseEntity.ok(articleRepository.findById(uuid));
+        }
+        return ResponseEntity.notFound().build();*/
     }
 
     @PutMapping("/articles/{id}")
@@ -39,5 +48,10 @@ public class ArticlesController {
                     return articleRepository.save(article);
                 }
         );
+    }
+
+    @DeleteMapping("/articles/{id}")
+    public void deleteArticle(@PathVariable("id") UUID uuid) {
+        articleRepository.deleteById(uuid);
     }
 }
