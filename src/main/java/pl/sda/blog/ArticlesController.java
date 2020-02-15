@@ -30,4 +30,14 @@ public class ArticlesController {
     public Optional<Article> getArticleById(@PathVariable("id") UUID uuid) {
         return articleRepository.findById(uuid);
     }
+
+    @PutMapping("/articles/{id}")
+    public Optional<Article> putArticle(@PathVariable("id") UUID uuid, @RequestBody Article articleThatWillReplaceTheOldOne) {
+        return articleRepository.findById(uuid).map(article ->
+                {
+                    article.setTitle(articleThatWillReplaceTheOldOne.getTitle());
+                    return articleRepository.save(article);
+                }
+        );
+    }
 }

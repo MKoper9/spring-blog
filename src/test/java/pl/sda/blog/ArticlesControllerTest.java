@@ -1,6 +1,7 @@
 package pl.sda.blog;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,24 +10,30 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.net.URI;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class ArticlesControllerTest {
     public static final String ARTICLES = "/articles";
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private ArticleRepository articleRepository;
+
+    @BeforeEach
+    void cleanDb() {
+        articleRepository.deleteAll();
+    }
 
     // @formatter:off
     @DisplayName(
@@ -84,15 +91,46 @@ public class ArticlesControllerTest {
         // given
         String articleToSend1 = "{ \"title\": \"My First Article\" }";
         String articleToSend2 = "{ \"title\": \"My Second Article\" }";
-
-        // when
         UUID idOfTheFirstArticle = createArticle(articleToSend1);
         createArticle(articleToSend2);
 
-        // then
+        // when
         mockMvc.perform(get("/articles/{id}", idOfTheFirstArticle))
+
+        // then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title", is("My First Article")));
+        // @formatter:on
+    }
+
+    // @formatter:off
+    @DisplayName(
+            "given two created articles with titles 'My First article' and 'My Second Article', " +
+            "when PUT new article with title 'Updated Article' on /articles/id, where id is id of the first article, " +
+            "then the title of the first article is now 'Updated Article'"
+    )
+    // @formatter:on
+    @Test
+    void test3() throws Exception {
+        // @formatter:off
+        // given
+        String articleToSend1 = "{ \"title\": \"My First Article\" }";
+        String articleToSend2 = "{ \"title\": \"My Second Article\" }";
+        UUID idOfTheFirstArticle = createArticle(articleToSend1);
+        createArticle(articleToSend2);
+
+        // when
+        String newArticleThatReplacesTheFirstOne = "{ \"title\": \"Updated Article\" }";
+        mockMvc.perform(
+                put("/articles/{id}", idOfTheFirstArticle)
+                .content(newArticleThatReplacesTheFirstOne)
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+
+        // then
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/articles/{id}", idOfTheFirstArticle))
+                .andExpect(jsonPath("$.title", is("Updated Article")));
         // @formatter:on
     }
 
