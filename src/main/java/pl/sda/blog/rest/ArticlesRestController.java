@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.sda.blog.Article;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,9 +24,10 @@ public class ArticlesRestController {
         return articleRepository.findAll();
     }
 
+    @RolesAllowed("ADMIN")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public Article postArticles(@RequestBody Article article) {
+    public Article createArticle(@RequestBody Article article) {
         return articleRepository.save(article);
     }
 
@@ -42,8 +44,9 @@ public class ArticlesRestController {
         return ResponseEntity.notFound().build();*/
     }
 
+    @RolesAllowed("ADMIN")
     @PutMapping("/{id}")
-    public Optional<Article> putArticle(@PathVariable("id") UUID uuid, @RequestBody Article articleThatWillReplaceTheOldOne) {
+    public Optional<Article> editArticle(@PathVariable("id") UUID uuid, @RequestBody Article articleThatWillReplaceTheOldOne) {
         return articleRepository.findById(uuid).map(article ->
                 {
                     article.setTitle(articleThatWillReplaceTheOldOne.getTitle());
@@ -52,6 +55,7 @@ public class ArticlesRestController {
         );
     }
 
+    @RolesAllowed("ADMIN")
     @DeleteMapping("/{id}")
     public void deleteArticle(@PathVariable("id") UUID uuid) {
         articleRepository.deleteById(uuid);

@@ -16,12 +16,7 @@ public class RepositoryDetailsService implements UserDetailsService {
 
 	public RepositoryDetailsService(UserRepository userRepository) {
 		this.userRepository = userRepository;
-		// in real application we should create such a user e.g. in
-		// migration scripts
-		BlogUser testUser = new BlogUser("test_user",
-			// the password is test_user_password
-			"$2a$10$FApO0z5/bkTM8PSVkHyw3ONavCXTyBE5RDOcjN1iyDZl4WydZb6ga", "USER");
-		this.userRepository.save(testUser);
+		createDefaultUsers();
 	}
 
 	@Override
@@ -34,5 +29,20 @@ public class RepositoryDetailsService implements UserDetailsService {
 			.orElseThrow(() -> new UsernameNotFoundException(String
 				.format("User %s not found in the database.",
 					username)));
+	}
+
+	private void createDefaultUsers() {
+		// in real application we should create such a user e.g. in
+		// migration scripts
+		BlogUser testUser = new BlogUser("test_user",
+			// the password is test_user_password
+			"$2a$10$FApO0z5" +
+				"/bkTM8PSVkHyw3ONavCXTyBE5RDOcjN1iyDZl4WydZb6ga", "USER");
+		BlogUser adminUser =
+			// the password is admin
+			new BlogUser("admin",
+				"$2a$10$AjRnNpw0tXI3avPutzZDOOhwLdFPiMtYfq9g2Z6V2kXAfmdMWcW/S", "ADMIN");
+		userRepository.save(testUser);
+		userRepository.save(adminUser);
 	}
 }
