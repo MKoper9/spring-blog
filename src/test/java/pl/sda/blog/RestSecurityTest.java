@@ -35,8 +35,8 @@ public class RestSecurityTest {
 
     // @formatter:off
     @DisplayName(
-            "when GET on /rest/articles without credentials, " +
-            "then Unauthorized status is returned"
+            "when GET on /rest/articles with test user credentials, " +
+            "then OK status is returned"
     )
     // @formatter:on
     @Test

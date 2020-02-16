@@ -1,5 +1,6 @@
 package pl.sda.blog.frontend;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -17,24 +18,29 @@ import java.util.Map;
 
 @Controller
 public class FrontendController {
-    private RestTemplate restTemplate;
 
-    public FrontendController(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
+	private RestTemplate restTemplate;
+	private String articlesRestApiEndpoint;
 
-    @GetMapping("/frontend/articles")
-    public ModelAndView showAllArticles() throws URISyntaxException {
-        Map<String, List<Article>> articlesMap = new HashMap<>();
+	public FrontendController(RestTemplate restTemplate, @Value("${pl.sda" +
+                ".blog.rest.articles}") String articlesRestApiEndpoint) {
+		this.restTemplate = restTemplate;
+		this.articlesRestApiEndpoint = articlesRestApiEndpoint;
+	}
 
-        RequestEntity requestEntity = RequestEntity.get(new URI("http://localhost:8080/rest/articles"))
-                .header("Authorization", "Basic dGVzdF91c2VyOnRlc3RfdXNlcl9wYXNzd29yZA==")
-                .build();
-        ResponseEntity<List<Article>> articles = restTemplate.exchange(requestEntity,
-                new ParameterizedTypeReference<List<Article>>() {
-                });
-        articlesMap.put("articles", articles.getBody());
+	@GetMapping("/frontend/articles")
+	public ModelAndView showAllArticles() throws URISyntaxException {
+		Map<String, List<Article>> articlesMap = new HashMap<>();
 
-        return new ModelAndView("articles", articlesMap);
-    }
+		RequestEntity requestEntity = RequestEntity
+			.get(new URI(articlesRestApiEndpoint))
+			.header("Authorization", "Basic dGVzdF91c2VyOnRlc3RfdXNlcl9wYXNzd29yZA==")
+			.build();
+		ResponseEntity<List<Article>> articles = restTemplate
+			.exchange(requestEntity, new ParameterizedTypeReference<List<Article>>() {
+			});
+		articlesMap.put("articles", articles.getBody());
+
+		return new ModelAndView("articles", articlesMap);
+	}
 }

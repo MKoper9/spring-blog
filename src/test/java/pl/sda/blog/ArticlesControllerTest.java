@@ -7,38 +7,69 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import pl.sda.blog.rest.ArticleRepository;
+import pl.sda.blog.rest.ArticleService;
 
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WithMockUser
+@WithMockUser(roles = "ADMIN")
 @SpringBootTest
 @AutoConfigureMockMvc
 //@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class ArticlesControllerTest {
-    public static final String ARTICLES = "/rest/articles";
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    private ArticleRepository articleRepository;
 
-    @BeforeEach
-    void cleanDb() {
-        articleRepository.deleteAll();
-    }
+	public static final String ARTICLES = "/rest/articles";
+	@Autowired
+	private MockMvc mockMvc;
+	@Autowired
+	private ObjectMapper objectMapper;
+	@Autowired
+	private ArticleRepository articleRepository;
+	@MockBean
+	private ArticleService articleService;
 
-    // @formatter:off
+	@BeforeEach
+	void cleanDb() {
+		articleRepository.deleteAll();
+	}
+
+	// @formatter:off
+        @DisplayName(
+            "when POST on /rest/articles/{id}/comments, " +
+	    "then new comment is added"
+        )
+        // @formatter:on
+	@Test
+	@WithMockUser(roles = "ADMIN", username = "someUser")
+	void addComment() throws Exception {
+		// given
+		String addCommentDto = "{ \"content\": \"new comment\" }";
+		String articleId = "1344ef9e-50b5-11ea-8d77-2e728ce88125";
+
+		// when
+		mockMvc.perform(post("/rest/articles/{id}/comments", articleId)
+			.content(addCommentDto)
+			.contentType(MediaType.APPLICATION_JSON))
+
+			// then
+			.andExpect(status().isOk());
+		verify(articleService, times(1)).addComment(UUID
+			.fromString(articleId), "new comment", "someUser");
+	}
+
+	// @formatter:off
     @DisplayName(
             "when GET on /rest/articles, " +
             "then 200 status is returned"
@@ -46,12 +77,10 @@ public class ArticlesControllerTest {
     // @formatter:on
     @Test
     void test() throws Exception {
-        mockMvc
-                .perform(get("/rest/articles"))
-                .andExpect(status().isOk());
+	    mockMvc.perform(get("/rest/articles")).andExpect(status().isOk());
     }
 
-    // @formatter:off
+	// @formatter:off
     @DisplayName(
             "given article with title 'My First Article', " +
             "when POST this article on /rest/articles, " +
@@ -60,7 +89,7 @@ public class ArticlesControllerTest {
     // @formatter:on
     @Test
     void test1() throws Exception {
-        // @formatter:off
+	    // @formatter:off
         // given
         String articleToSend = "{ \"title\": \"My First Article\" }";
 
@@ -81,7 +110,7 @@ public class ArticlesControllerTest {
         // @formatter:on
     }
 
-    // @formatter:off
+	// @formatter:off
     @DisplayName(
             "given two created articles with titles 'My First article' and 'My Second Article', " +
             "when GET /rest/articles/id, where id is id of the first article, " +
@@ -90,7 +119,7 @@ public class ArticlesControllerTest {
     // @formatter:on
     @Test
     void test2() throws Exception {
-        // @formatter:off
+	    // @formatter:off
         // given
         String articleToSend1 = "{ \"title\": \"My First Article\" }";
         String articleToSend2 = "{ \"title\": \"My Second Article\" }";
@@ -106,7 +135,7 @@ public class ArticlesControllerTest {
         // @formatter:on
     }
 
-    // @formatter:off
+	// @formatter:off
     @DisplayName(
             "given two created articles with titles 'My First article' and 'My Second Article', " +
             "when PUT new article with title 'Updated Article' on /rest/articles/id, where id is id of the first article, " +
@@ -115,7 +144,7 @@ public class ArticlesControllerTest {
     // @formatter:on
     @Test
     void test3() throws Exception {
-        // @formatter:off
+	    // @formatter:off
         // given
         String articleToSend1 = "{ \"title\": \"My First Article\" }";
         String articleToSend2 = "{ \"title\": \"My Second Article\" }";
@@ -137,7 +166,7 @@ public class ArticlesControllerTest {
         // @formatter:on
     }
 
-    // @formatter:off
+	// @formatter:off
     @DisplayName(
             "given two created articles with titles 'My First article' and 'My Second Article', " +
             "when DELETE article with /rest/articles/id, where id is id of the first article, " +
@@ -147,7 +176,7 @@ public class ArticlesControllerTest {
     // @formatter:on
     @Test
     void test4() throws Exception {
-        // @formatter:off
+	    // @formatter:off
         // given
         String articleToSend1 = "{ \"title\": \"My First Article\" }";
         String articleToSend2 = "{ \"title\": \"My Second Article\" }";
@@ -166,18 +195,16 @@ public class ArticlesControllerTest {
         // @formatter:on
     }
 
-    private UUID createArticle(String article) throws Exception {
-        String resultAsJson = mockMvc
-                .perform(
-                        post(ARTICLES)
-                                .content(article)
-                                .contentType(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
+	private UUID createArticle(String article) throws Exception {
+		String resultAsJson = mockMvc
+			.perform(post(ARTICLES).content(article)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isCreated()).andReturn()
+			.getResponse().getContentAsString();
 
-        Article createdArticle = objectMapper.readValue(resultAsJson, Article.class);
+		Article createdArticle = objectMapper
+			.readValue(resultAsJson, Article.class);
 
-        return createdArticle.getId();
-    }
+		return createdArticle.getId();
+	}
 }
