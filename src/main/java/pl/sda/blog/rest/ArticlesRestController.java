@@ -2,10 +2,10 @@ package pl.sda.blog.rest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.sda.blog.Article;
 
-import javax.annotation.security.RolesAllowed;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
@@ -29,14 +29,14 @@ public class ArticlesRestController {
 		return articleRepository.findAll();
 	}
 
-	@RolesAllowed("ADMIN")
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping
-	public Article createArticle(@RequestBody Article article) {
+	public Article createArticle(@RequestBody Article article,
+				     Principal principal) {
+		article.setAuthor(principal.getName());
 		return articleRepository.save(article);
 	}
 
-	@RolesAllowed("ADMIN")
 	@PostMapping("/{articleId}/comments")
 	public void addComment(@PathVariable("articleId") UUID articleId,
 			       @RequestBody AddCommentDto addCommentDto,
@@ -58,7 +58,8 @@ public class ArticlesRestController {
         return ResponseEntity.notFound().build();*/
 	}
 
-	@RolesAllowed("ADMIN")
+	@PreAuthorize("hasRole('ADMIN') || hasPermission(#uuid, 'pl.sda.blog" +
+		".Article', 'OWNER')")
 	@PutMapping("/{id}")
 	public Optional<Article> editArticle(@PathVariable("id") UUID uuid,
 					     @RequestBody Article articleThatWillReplaceTheOldOne) {
@@ -69,7 +70,8 @@ public class ArticlesRestController {
 		});
 	}
 
-	@RolesAllowed("ADMIN")
+	@PreAuthorize("hasRole('ADMIN') || hasPermission(#uuid, 'pl.sda.blog" +
+		".Article', 'OWNER')")
 	@DeleteMapping("/{id}")
 	public void deleteArticle(@PathVariable("id") UUID uuid) {
 		articleRepository.deleteById(uuid);
