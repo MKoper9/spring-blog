@@ -15,6 +15,7 @@ public class Article {
 	private UUID id;
 	private String title;
 	private String content;
-	@OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
 	private Collection<Comment> comments;
+	private String author;
 }
